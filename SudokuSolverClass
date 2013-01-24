@@ -1,0 +1,90 @@
+package com.sudoku.solver;
+
+import com.sudoku.board.SudokuBoard;
+import com.sudoku.board.section.SudokuSection;
+
+public class SudokuSolver {
+  private SudokuBoard board, solution;
+	private boolean illegalBoardCheck;
+	private int solutions;
+	
+	public SudokuSolver(boolean illegalCheck){ 
+		illegalBoardCheck = illegalCheck; 
+		solutions = 0; 
+	}
+	
+	public void solve(SudokuBoard sb){
+		this.board = sb;
+		solveHelper(0, 0, board);
+		
+		if(solutions == 0)
+			System.err.println("No solutions found.");
+		else if(solutions > 1)
+			System.err.println("Illegal Sudoku Board, " + solutions + 
+														" solutions found.");
+		solution.print();
+	}
+		
+		
+	public void solveHelper(int x, int y, SudokuBoard board){
+		if(!illegalBoardCheck){		//a LOT faster without check
+			if(solutions > 0)		
+				return;				
+		}							
+		
+		if(board.isComplete()){		//sol'n has been found
+			solutions++;
+			if(solution == null)
+				solution = new SudokuBoard(board);
+			return;
+		}
+		
+		int nextX, nextY;
+		if(x == 8){
+			nextX = 0;
+			nextY = y + 1;
+		} else {
+			nextX = x + 1;
+			nextY = y;
+		}
+		
+		if(board.getSpace(x, y) != 0){			//skip if spot is already defined
+			solveHelper(nextX, nextY, board);
+			return;
+		}
+		
+		for(int value = 1; value <= 9; value++){		//else go through the possibilities
+			if(promising(x, y, value, board)){
+				board.updateSpace(x, y, value);
+//				board.print();
+				solveHelper(nextX, nextY, board);				//send it down
+			}
+		}
+		board.updateSpace(x, y, 0);
+	}
+	
+	private boolean promising(int x, int y, int value, SudokuBoard board){
+		//check the row for a dup.
+		for(int i = 0; i < 9; i++){
+			if(board.getSpace(i, y) == value)
+				return false;
+		}
+		
+		//check the column
+		for(int j = 0; j < 9; j++){
+			if(board.getSpace(x, j) == value)
+				return false;
+		}
+		
+		//check the indv. section
+		SudokuSection section = board.getSection(x, y);
+		for(int i = 0; i < 3; i++){
+			for(int j = 0; j < 3; j++){
+				if(section.getSpace(i, j) == value)
+					return false;
+			}
+		}
+		
+		return true;
+	}
+}

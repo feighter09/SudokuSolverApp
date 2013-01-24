@@ -20,8 +20,7 @@ public class SudokuSolver {
 		if(solutions == 0)
 			System.err.println("No solutions found.");
 		else if(solutions > 1)
-			System.err.println("Illegal Sudoku Board, " + solutions + 
-														" solutions found.");
+			System.err.println("Illegal Sudoku Board, " + solutions + " solutions found.");
 		solution.print();
 	}
 		
